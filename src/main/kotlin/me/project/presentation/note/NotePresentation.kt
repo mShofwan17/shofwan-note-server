@@ -16,14 +16,13 @@ object NotePresentation : BasePresentation() {
         getListNotesUseCase: GetListNotesUseCase
     ) {
         route.get {
-            tryResponse(this) {
+            tryResponse(this) { httpCode ->
                 getListNotesUseCase()?.let {
                     call.respond(
-                        message = responseSuccess(it),
+                        message = onSuccess(it),
                         status = httpCode
                     )
-                } ?: emptyResult(this)
-
+                } ?: call.emptyResult()
             }
         }
     }
@@ -33,14 +32,14 @@ object NotePresentation : BasePresentation() {
         getNoteByIdUseCase: GetNoteByIdUseCase
     ) {
         route.get("{id?}") {
-            tryResponse(this) {
+            tryResponse(this) { httpCode ->
                 val id = call.parameters["id"]
                 getNoteByIdUseCase(id?.toInt())?.let {
                     call.respond(
-                        message = responseSuccess(it),
+                        message = onSuccess(it),
                         status = httpCode
                     )
-                } ?: emptyResult(this)
+                } ?: call.emptyResult()
 
             }
         }
@@ -51,10 +50,10 @@ object NotePresentation : BasePresentation() {
         addNoteUseCase: AddNoteUseCase
     ) {
         route.post {
-            tryResponse(this) {
+            tryResponse(this) { httpCode ->
                 val note = call.receive<Note>()
                 call.respond(
-                    message = responseSuccess(addNoteUseCase(note = note)),
+                    message = onSuccess(addNoteUseCase(note = note)),
                     status = httpCode
                 )
             }

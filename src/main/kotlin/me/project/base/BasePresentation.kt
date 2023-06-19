@@ -8,21 +8,19 @@ import io.ktor.util.pipeline.*
 
 abstract class BasePresentation {
     private var _httpCode = HttpStatusCode.OK
-    val httpCode get() = _httpCode
-
     private val dataIsNull = "Data tidak ditemukan"
     suspend fun tryResponse(
         call: PipelineContext<Unit, ApplicationCall>,
-        block: suspend () -> Unit
+        block: suspend (httpCode : HttpStatusCode) -> Unit
     ) {
         try {
             _httpCode = HttpStatusCode.OK
-            block.invoke()
+            block.invoke(_httpCode)
         } catch (e: NotFoundException) {
             _httpCode = HttpStatusCode.NotFound
             call.call.respond(
                 status = HttpStatusCode.NotFound,
-                message = responseError(
+                message = onError(
                     exceptionMsg = e.message
                 )
             )
@@ -30,7 +28,7 @@ abstract class BasePresentation {
             _httpCode = HttpStatusCode.BadRequest
             call.call.respond(
                 status = HttpStatusCode.BadRequest,
-                message = responseError(
+                message = onError(
                     exceptionMsg = e.message
                 )
             )
@@ -38,20 +36,20 @@ abstract class BasePresentation {
             _httpCode = HttpStatusCode.InternalServerError
             call.call.respond(
                 status = _httpCode,
-                message = responseError(
+                message = onError(
                     exceptionMsg = e.message
                 )
             )
         }
     }
 
-     fun <T> responseSuccess(result: T?) = BaseResponse(
+     fun <T> onSuccess(result: T?) = BaseResponse(
         statusCode = _httpCode.value,
         message = _httpCode.description,
         result
     )
 
-    private fun responseError(
+    private fun onError(
         isEmptyResult: Boolean = false,
         exceptionMsg: String? = null
     ): BaseResponse<String?> {
@@ -66,10 +64,10 @@ abstract class BasePresentation {
         )
     }
 
-    suspend fun emptyResult(call: PipelineContext<Unit, ApplicationCall>) {
-        call.call.respond(
-            message = responseError(true),
-            status = httpCode
+    suspend fun ApplicationCall.emptyResult() {
+        respond(
+            message = onError(true),
+            status = _httpCode
         )
     }
 }
