@@ -10,4 +10,5 @@ interface NoteRepository {
     suspend fun addNote(note: Note): Note?
     suspend fun updateNote(note: Note): Boolean?
     suspend fun searchByName(name: String): List<Note>?
+    suspend fun deleteNote(id: Int): Boolean
 }

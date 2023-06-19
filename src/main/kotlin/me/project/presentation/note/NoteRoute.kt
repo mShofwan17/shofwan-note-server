@@ -10,6 +10,7 @@ fun Route.noteRouting() {
     val addNoteUseCase: AddNoteUseCase by inject()
     val updateNoteUseCase: UpdateNoteUseCase by inject()
     val searchNoteByNameUseCase: SearchNoteByNameUseCase by inject()
+    val deleteNoteUseCase: DeleteNoteUseCase by inject()
 
     route("notes") {
         NotePresentation.apply {
@@ -34,6 +35,11 @@ fun Route.noteRouting() {
                 route,
                 updateNoteUseCase,
                 getNoteByIdUseCase
+            )
+
+            deleteNote(
+                route,
+                deleteNoteUseCase
             )
         }
 

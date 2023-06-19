@@ -72,4 +72,12 @@ class NoteRepositoryImpl(
         }
 
     }
+
+    override suspend fun deleteNote(id: Int): Boolean {
+        NoteTable.apply {
+            return transaction(instance) {
+                deleteWhere { this@apply.id eq id } > 0
+            }
+        }
+    }
 }

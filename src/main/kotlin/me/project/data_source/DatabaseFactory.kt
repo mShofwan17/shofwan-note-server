@@ -7,7 +7,7 @@ class DatabaseFactory {
     val dbInstance get() = _database
     init {
         val jdbcURL = "jdbc:mysql://localhost:3306/db_shofwan_note"
-        val driverName = "com.mysql.jdbc.Driver"
+        val driverName = "com.mysql.cj.jdbc.Driver"
         _database = Database.connect(
             url = jdbcURL,
             driver = driverName,

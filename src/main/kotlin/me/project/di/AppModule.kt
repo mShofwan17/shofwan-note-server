@@ -20,4 +20,5 @@ val useCaseModule = module {
     single<AddNoteUseCase> { AddNoteUseCase(get()) }
     single<UpdateNoteUseCase> { UpdateNoteUseCase(get()) }
     single<SearchNoteByNameUseCase> { SearchNoteByNameUseCase(get()) }
+    single<DeleteNoteUseCase> { DeleteNoteUseCase(get()) }
 }

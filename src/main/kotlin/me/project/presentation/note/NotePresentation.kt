@@ -17,7 +17,7 @@ object NotePresentation : BasePresentation() {
         route.get {
             tryResponse(this) { httpCode ->
                 val title = call.request.queryParameters["title"]
-                if (title.isNullOrEmpty()){
+                if (title.isNullOrEmpty()) {
                     getListNotesUseCase()?.let {
                         call.respond(
                             message = onSuccess(it),
@@ -84,6 +84,23 @@ object NotePresentation : BasePresentation() {
                     )
                 } else updateNote?.let { call.failedUpdateData(note.id) } ?: call.emptyResult()
 
+            }
+        }
+    }
+
+    fun deleteNote(
+        route: Route,
+        deleteNoteUseCase: DeleteNoteUseCase
+    ) {
+        route.delete("{id?}") {
+            tryResponse(this) {
+                val id = call.parameters["id"]
+                deleteNoteUseCase(id?.toInt()).also { isSuccess ->
+                    if (isSuccess == true) call.respond(
+                        message = onSuccess("Berhasil menghapus Data dengan ID : $id")
+                    )
+                    else call.failedUpdateData(id?.toInt())
+                }
             }
         }
     }
