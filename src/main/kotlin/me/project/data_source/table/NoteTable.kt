@@ -1,12 +1,10 @@
 package me.project.data_source.table
 
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.dao.id.IntIdTable
 
-object NoteTable : Table() {
-    val id = integer("id").autoIncrement()
-    val title = varchar("title",128)
-    val description = varchar("description",1024)
-    val timestamp = varchar("timestamp",128)
-
-    override val primaryKey = PrimaryKey(id)
+private const val TABLE_NAME ="tb_note"
+object NoteTable : IntIdTable(TABLE_NAME) {
+    val title = varchar("title",255)
+    val description = largeText("description")
+    val timestamp = varchar("timestamp",255)
 }

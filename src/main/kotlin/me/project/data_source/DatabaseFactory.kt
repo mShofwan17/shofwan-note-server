@@ -1,27 +1,18 @@
 package me.project.data_source
 
-import kotlinx.coroutines.Dispatchers
-import me.project.data_source.table.NoteTable
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class DatabaseFactory {
+    private var _database : Database ?= null
+    val dbInstance get() = _database
     init {
-        val jdbcURL = "jdbc:h2:file:./build/db"
-        val driverName = "org.h2.Driver"
-        val database = Database.connect(
+        val jdbcURL = "jdbc:mysql://localhost:3306/db_shofwan_note"
+        val driverName = "com.mysql.jdbc.Driver"
+        _database = Database.connect(
             url = jdbcURL,
-            driver = driverName
+            driver = driverName,
+            user = "root",
+            password = "123456nwm"
         )
-
-        transaction(database) {
-            SchemaUtils.create(NoteTable)
-        }
-    }
-
-    suspend fun <T> dbQuery(block: suspend () -> T): T {
-        return newSuspendedTransaction(Dispatchers.IO) { block() }
     }
 }

@@ -5,6 +5,7 @@ val koin_version: String by project
 val exposed_version: String by project
 val sqlite_version: String by project
 val h2_version: String by project
+val mysql_connector_version: String by project
 
 plugins {
     kotlin("jvm") version "1.8.22"
@@ -53,4 +54,7 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:$sqlite_version")
     //h2 database
     implementation("com.h2database:h2:$h2_version")
+    //sql connector
+    implementation("mysql:mysql-connector-java:$mysql_connector_version")
+
 }

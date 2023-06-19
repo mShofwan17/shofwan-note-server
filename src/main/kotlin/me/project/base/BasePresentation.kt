@@ -70,4 +70,12 @@ abstract class BasePresentation {
             status = _httpCode
         )
     }
+
+    suspend fun ApplicationCall.failedUpdateData(id : Int?){
+        _httpCode = HttpStatusCode.BadRequest
+        respond(
+            message = onError(exceptionMsg = "Gagal Update Data Note id : $id"),
+            status = _httpCode
+        )
+    }
 }

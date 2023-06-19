@@ -6,23 +6,30 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import me.project.base.BasePresentation
 import me.project.models.Note
-import me.project.usecases.notes.AddNoteUseCase
-import me.project.usecases.notes.GetListNotesUseCase
-import me.project.usecases.notes.GetNoteByIdUseCase
+import me.project.usecases.notes.*
 
 object NotePresentation : BasePresentation() {
     fun getAllNotes(
         route: Route,
-        getListNotesUseCase: GetListNotesUseCase
+        getListNotesUseCase: GetListNotesUseCase,
+        searchNoteByNameUseCase: SearchNoteByNameUseCase
     ) {
         route.get {
             tryResponse(this) { httpCode ->
-                getListNotesUseCase()?.let {
+                val title = call.request.queryParameters["title"]
+                if (title.isNullOrEmpty()){
+                    getListNotesUseCase()?.let {
+                        call.respond(
+                            message = onSuccess(it),
+                            status = httpCode
+                        )
+                    } ?: call.emptyResult()
+                } else {
                     call.respond(
-                        message = onSuccess(it),
+                        message = onSuccess(searchNoteByNameUseCase(title)),
                         status = httpCode
                     )
-                } ?: call.emptyResult()
+                }
             }
         }
     }
@@ -56,6 +63,27 @@ object NotePresentation : BasePresentation() {
                     message = onSuccess(addNoteUseCase(note = note)),
                     status = httpCode
                 )
+            }
+        }
+    }
+
+    fun updateNote(
+        route: Route,
+        updateNoteUseCase: UpdateNoteUseCase,
+        getNoteByIdUseCase: GetNoteByIdUseCase
+    ) {
+        route.put("{id?}") {
+            tryResponse(this) {
+                val id = call.parameters["id"]
+                val note = call.receive<Note>().copy(id = id?.toInt())
+                val updateNote = updateNoteUseCase(note = note)
+                if (updateNote == true) {
+                    call.respond(
+                        message = onSuccess(getNoteByIdUseCase(note.id)),
+                        status = it
+                    )
+                } else updateNote?.let { call.failedUpdateData(note.id) } ?: call.emptyResult()
+
             }
         }
     }
